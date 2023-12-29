@@ -2,18 +2,31 @@
 
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, PowerIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowLongRightIcon } from "@heroicons/react/16/solid";
 import Link from "next/link";
-
-const navigation = [
-  { name: "Product", href: "#" },
-  { name: "Features", href: "#" },
-  { name: "Marketplace", href: "#" },
-  { name: "Company", href: "#" },
-];
+import { useSession } from "next-auth/react";
+import { signOutAsync } from "@/app/lib/actions";
 
 export default function Navbar() {
+  const { data: session, update } = useSession();
+
+  const isLoggedIn = !!session?.user;
+
+  // Different nav links for logged in user
+  const navigation = isLoggedIn
+    ? [
+        { name: "Dashboard", href: "#" },
+        { name: "Bills", href: "#" },
+        { name: "Paydays", href: "#" },
+      ]
+    : [];
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleSignOut = () => {
+    signOutAsync();
+  };
 
   return (
     <>
@@ -35,7 +48,7 @@ export default function Navbar() {
           <button
             type="button"
             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
-            onClick={() => setMobileMenuOpen(true)}>
+            onClick={async () => setMobileMenuOpen(true)}>
             <span className="sr-only">Open main menu</span>
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </button>
@@ -51,11 +64,19 @@ export default function Navbar() {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <Link
-            href="/login"
-            className="text-sm font-semibold leading-6 text-gray-900">
-            Log in <span aria-hidden="true">&rarr;</span>
-          </Link>
+          {isLoggedIn ? (
+            <button
+              onClick={handleSignOut}
+              className="flex items-center text-sm font-semibold leading-6 text-gray-900">
+              Sign out <PowerIcon className="ms-1 h-4" aria-hidden="true" />
+            </button>
+          ) : (
+            <Link
+              href={`${process.env.NEXT_PUBLIC_SIGNIN_PATH}`}
+              className="flex items-center text-sm font-semibold leading-6 text-gray-900">
+              Log in <ArrowLongRightIcon className="h-4" aria-hidden="true" />
+            </Link>
+          )}
         </div>
       </nav>
       <Dialog
@@ -77,7 +98,7 @@ export default function Navbar() {
             <button
               type="button"
               className="-m-2.5 rounded-md p-2.5 text-gray-700"
-              onClick={() => setMobileMenuOpen(false)}>
+              onClick={async () => setMobileMenuOpen(false)}>
               <span className="sr-only">Close menu</span>
               <XMarkIcon className="h-6 w-6" aria-hidden="true" />
             </button>
@@ -95,11 +116,19 @@ export default function Navbar() {
                 ))}
               </div>
               <div className="py-6">
-                <Link
-                  href="/login"
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
-                  Log in
-                </Link>
+                {isLoggedIn ? (
+                  <button
+                    onClick={handleSignOut}
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                    Sign out
+                  </button>
+                ) : (
+                  <Link
+                    href={`${process.env.NEXT_PUBLIC_SIGNIN_PATH}`}
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                    Log in
+                  </Link>
+                )}
               </div>
             </div>
           </div>

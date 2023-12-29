@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import Navbar from "@/app/ui/navbar";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,10 +19,12 @@ export default function RootLayout({
   return (
     <html className="h-full bg-white" lang="en">
       <body className={`${inter.className} h-full`}>
-        <header className="absolute inset-x-0 top-0 z-50">
-          <Navbar />
-        </header>
-        {children}
+        <SessionProvider>
+          <header className="absolute inset-x-0 top-0 z-50">
+            <Navbar />
+          </header>
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

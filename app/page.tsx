@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { auth } from "@/auth";
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
+
   return (
     <div className="relative isolate px-6 pt-14 lg:px-8">
       <div
